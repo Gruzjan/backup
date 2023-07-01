@@ -13,7 +13,7 @@ You can use Windows task scheduler to execute this script every night. You can f
 1. Clone the repository
 ```git clone https://github.com/Gruzjan/backup.git```
 
-2. Download the required Python packages by running the following command in your command prompt or terminal:
+2. Download the required Python packages:
 ```pip install -r requirements.txt```
 
 3. Remove `.example` from your `.env` and adjust it to your needs. Note the backslashes and semicolons to seperate multiple paths:
