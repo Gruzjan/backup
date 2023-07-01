@@ -7,6 +7,7 @@ def getAccount():
     return mega.login(os.getenv('LOGIN'), os.getenv('PASSWORD'))
 
 def compareSizes(path, account):
+    print("Comparing sizes")
     filename = os.path.basename(path)
     createZip(path)
     if account.find(f"{filename}.zip") is None or account.find(f"{filename}.zip")[1]["s"] != os.stat(f"{filename}.zip").st_size:
@@ -15,15 +16,28 @@ def compareSizes(path, account):
 
 def createZip(path):
     shutil.make_archive(os.path.basename(path), 'zip')
+    print("Created zip locally")
 
 def removeZip(path):
     os.remove(f"{os.path.basename(path)}.zip")
+    print("Removed zip locally")
 
 def uploadZip(path, account):
-    #TODO: Handle old backups
-    folder = account.find('Backups', exclude_deleted=True)
     filename = os.path.basename(path) 
-    account.upload(f"{filename}.zip", folder[0])
+    folder = account.find('Backups', exclude_deleted=True)
+    old = account.find(f'Backups/{filename}.zip', exclude_deleted=True)
+    if old:
+        older = account.find(f'Backups/{filename}_old.zip', exclude_deleted=True)
+        if older:
+            account.destroy(older[0])
+            print("Deleted old backup")
+        account.rename(old, f'{filename}_old.zip')
+        print("Created old backup")
+    try:
+        account.upload(f"{filename}.zip", folder[0])
+        print("Uploaded zip to mega")
+    except:
+        print("Something went wrong. Do you have enough space available on mega?")
 
 def main():
     load_dotenv()
